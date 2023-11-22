@@ -235,6 +235,14 @@ contract GroupHub is GroupStorage, GnfdAccessControl, CmnHub, IGroupHub {
                 }
                 IERC1155NonTransferable(ERC1155Token).burn(ackPkg.members[i], ackPkg.id, 1);
             }
+        } else if (ackPkg.opType != UpdateGroupOpType.RenewMembers) {
+            for (uint256 i; i < ackPkg.members.length; ++i) {
+                // skip if the member has token
+                if (IERC1155NonTransferable(ERC1155Token).balanceOf(ackPkg.members[i], ackPkg.id) != 0) {
+                    continue;
+                }
+                IERC1155NonTransferable(ERC1155Token).mint(ackPkg.members[i], ackPkg.id, 1, "");
+            }
         } else {
             revert("unexpected update operation");
         }
